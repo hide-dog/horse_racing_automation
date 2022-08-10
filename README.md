@@ -9,8 +9,8 @@ tn_data
 Package                   Version
 ------------------------- -----------
 beautifulsoup4  &nbsp;          4.11.1  
-bs4                   &nbsp;    0.0.1  
-lightgbm                  &nbsp;3.3.2  
+bs4             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;          0.0.1  
+lightgbm        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;          &nbsp;3.3.2  
 numpy                     1.22.3  
 pandas                    1.4.3  
 pip                       21.2.4  
