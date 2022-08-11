@@ -16,11 +16,17 @@ import matplotlib.pyplot as plt
 
 from sklearn import preprocessing
 
+# 1-5, ワイド
+year = 2022
+ll1 = [0]
+ll5 = [1,2,3,4,5]
+
 # ------------------------------------------------
 # read
 # ------------------------------------------------
 def read_files_temp():
-    fin = "re_data/2021_data/*/*"
+    fin = "re_data/" + str(year) + "_data/*/*"
+    # fin = "re_data/2022_data/*/*"
     # read data
     fff_info   = glob.glob( fin + "_info")
     fff_result = glob.glob( fin + "_result")
@@ -79,16 +85,18 @@ def main():
     
     # machine learning
     dir = "model/"
-    year = "2020"
+    Ym1 = str(year-1)
+    # year = "2021"
     for m in range(4):
         if m == 0:
-            model_name = dir + 'neural_network_' + year + '.sav'
+            model_name = dir + 'neural_network_' + Ym1 + '.sav'
         elif m == 1:    
-            model_name = dir + 'RandomForest_' + year + '.sav'
+            model_name = dir + 'RandomForest_' + Ym1 + '.sav'
+            continue
         elif m == 2:    
-            model_name = dir + 'lightgbm_' + year + '.sav'
+            model_name = dir + 'lightgbm_' + Ym1 + '.sav'
         elif m == 3:    
-            model_name = dir + 'catboost_' + year + '.sav'
+            model_name = dir + 'catboost_' + Ym1 + '.sav'
         #end
 
         # 保存したモデルをロードする
@@ -111,9 +119,9 @@ def main():
         # 当たり：if test_result[i] == (temp[0].tolist()).index(max(temp[0])):
         # オッズ：redata_info[i][18*13 + int(test_result[i])-1]
         # ----------------------------------
-        rieki_3rennpuku = 0
-        rieki_3rennpuku_l = []
-        rieki_3rennpuku_sum = 0
+        rieki = 0
+        rieki_l = []
+        rieki_sum = 0
         ite_all = 0
         ite_atari = 0
         for ii in range(len(redata_info)):
@@ -162,62 +170,63 @@ def main():
             p2 = 1 / (1 + odds2) # rate
             p3 = 1 / (1 + odds3) # rate
 
-            # 3-7-7, 三連複
+            # ------------------------
+            # ------------------------
+
+            # 1-5, ワイド
             import itertools
             
-            # l = [8,9,10,11,12,13,14]
-            # l = [3,4,5,6,7,8,9]
-            
-            # ll = [3,4,5]         # good
-            # l = [0,1,2,6,7,8,9]  # good
-
-            ll = [3,4,5]         # good
-            l = [0,1,2,6,7,8,9]  # good
-
-            combi = list(itertools.combinations(l, 2))
-
-            for j in range(len(combi)):
+            ii = 0
+            for j in range(len(ll5)):
                 
-                pred_rank1 = pred_rank[ll[j % 3]]  # 0, 1, 2, 0, 1, 2, 0, 1, 2...
-                idx = j // 3                   # 0, 0, 0, 1, 1, 1, 2, 2, 2...
-                pred_rank2 = pred_rank[combi[idx][0]]
-                pred_rank3 = pred_rank[combi[idx][1]]
-
+                pred_rank1 = pred_rank[ll1[0]]  # 0
+                pred_rank2 = pred_rank[ll5[j]]
+                
                 ite = 0
-                if (real_rank1 == pred_rank1 or real_rank1 == pred_rank2 or real_rank1 == pred_rank3) and \
-                    (real_rank2 == pred_rank1 or real_rank2 == pred_rank2 or real_rank2 == pred_rank3) and \
-                    (real_rank3 == pred_rank1 or real_rank3 == pred_rank2 or real_rank3 == pred_rank3):
-                    p = p1 * p2 * p3 * \
-                        ( 1 / ((1-p1) * (1-p1-p2)) + 1 / ((1-p1) * (1-p1-p3)) + \
-                        1 / ((1-p2) * (1-p2-p1)) + 1 / ((1-p2) * (1-p2-p3)) + \
-                        1 / ((1-p3) * (1-p3-p2)) + 1 / ((1-p3) * (1-p3-p1)))
+                if ((real_rank1 == pred_rank1 or real_rank1 == pred_rank2) and (real_rank2 == pred_rank1 or real_rank2 == pred_rank2)) or \
+                    ((real_rank2 == pred_rank1 or real_rank2 == pred_rank2) and (real_rank3 == pred_rank1 or real_rank3 == pred_rank2)) or \
+                    ((real_rank1 == pred_rank1 or real_rank1 == pred_rank2) and (real_rank3 == pred_rank1 or real_rank3 == pred_rank2)):
+                    p = 0
+                    # 1,2位の確率
+                    p += pl[0] * pl[1] / (1-pl[0])
+                    # 2,1位の確率
+                    p += pl[1] * pl[0] / (1-pl[1])
+                    
+                    for i in range(2, len(pl)):
+                        p += pl[i] * pl[0] * pl[1] / (1-pl[i])/(1-pl[i]-pl[0]) # 2,3位の確率
+                        p += pl[i] * pl[1] * pl[0] / (1-pl[i])/(1-pl[i]-pl[1]) # 3,2位の確率
+                        p += pl[0] * pl[i] * pl[1] / (1-pl[0])/(1-pl[0]-pl[i]) # 1,3位の確率
+                        p += pl[1] * pl[i] * pl[0] / (1-pl[1])/(1-pl[1]-pl[i]) # 3,1位の確率
+                    #end
+                    
                     fin_odds = (p / (1-p))**-1
                     if fin_odds < 1.0:
                         fin_odds = 1.0
                     #end
-                    rieki_3rennpuku += 100 * fin_odds
+                    rieki += 100 * fin_odds
                     ite = 100 * fin_odds
-                    ite_atari += 1
+                    ii = 1
                 #end
-                rieki_3rennpuku_sum -= 100
-                rieki_3rennpuku_sum += ite
+                rieki_sum -= 100
+                rieki_sum += ite
             #end
-            rieki_3rennpuku_l.append(rieki_3rennpuku_sum)
+            ite_atari += ii
+            rieki_l.append(rieki_sum)
         #end
 
         print("----------------------------")
-        print(" 3連複で常に3-7-7に6300円かけた場合")
-        print(" 回収金：" + str(rieki_3rennpuku))
-        print(" 回収率：" + str(rieki_3rennpuku / (ite_all*len(combi)*100)))
+        print(" ワイドで常に1-5に500円かけた場合")
+        print(" 回収金：" + str(rieki))
+        print(" 回収率：" + str(rieki / (ite_all*len(ll5)*100)))
         print(" 的中率：" + str(ite_atari / ite_all))
         print("----------------------------")
         
-        num_race_l = np.zeros(len(rieki_3rennpuku_l))
+        num_race_l = np.zeros(len(rieki_l))
         for i in range(len(num_race_l)):
             num_race_l[i] = i
         #end
 
-        plt.scatter(num_race_l, rieki_3rennpuku_l, s=1, marker="o", c = "b", alpha=1)
+        plt.scatter(num_race_l, rieki_l, s=1, marker="o", c = "b", alpha=1)
 
         plt.grid()
         plt.rcParams['axes.axisbelow'] = True
@@ -226,15 +235,16 @@ def main():
         # plt.ylim([-60, 60])
         plt.xlabel("Number of races", fontsize=14)
         # plt.ylabel("Profit, yen", fontsize=14)
-        plt.ylabel("rate, -", fontsize=14)
+        plt.ylabel("rieki, yen", fontsize=14)
         plt.xticks(fontsize=14)
         plt.yticks(fontsize=14)
-        tn = model_name.replace('_' + year + '.sav',"")
+        tn = model_name.replace('_' + Ym1 + '.sav',"")
         tn = tn.replace(dir,"")
         plt.title(tn, fontsize=14)
         plt.tight_layout()
 
-        plt.savefig("rieki_sannrennpuku_" + str(m) + "_2021_2020model.png", format="png")
+        plt.savefig("rieki_waido" + "_" + str(year) + "_" + Ym1 + "model_" + str(m) + ".png", format="png")
+        # plt.savefig("rieki_sannrennpuku" + "_2022_2021model_" + str(m) + ".png", format="png")
         plt.clf()
     #end
 #end

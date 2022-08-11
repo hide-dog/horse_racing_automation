@@ -8,28 +8,27 @@
 # ------------------------------------------------
 # import
 # ------------------------------------------------
-import pandas as pd
 import numpy as np
 import glob
 from tqdm import tqdm
 import pickle
 import matplotlib.pyplot as plt
 
-
-# neural_network, random forest
-from sklearn import neural_network
-from sklearn.ensemble import RandomForestClassifier
-
-# lightGBM
-import lightgbm as lgb
-
 from sklearn import preprocessing
 
+# 3-7-7, 三連複
+year = 2021
+ll3 = [2,3,4]       
+ll7 = [0,1,5,6,7,8,9]
+
+# ll3 = [3,4,5]         # good
+# ll7 = [0,1,2,6,7,8,9]  # good
 # ------------------------------------------------
 # read
 # ------------------------------------------------
 def read_files_temp():
-    fin = "re_data/2022_data/*/*"
+    fin = "re_data/" + str(year) + "_data/*/*"
+    # fin = "re_data/2022_data/*/*"
     # read data
     fff_info   = glob.glob( fin + "_info")
     fff_result = glob.glob( fin + "_result")
@@ -85,18 +84,21 @@ def main():
 
     # get the explanatory variables for "test"
     explanatory_test = test_info
-
     
     # machine learning
     dir = "model/"
-    year = "2021"
-    for m in range(3):
+    Ym1 = str(year-1)
+    # year = "2021"
+    for m in range(4):
         if m == 0:
-            model_name = dir + 'neural_network_' + year + '.sav'
+            model_name = dir + 'neural_network_' + Ym1 + '.sav'
         elif m == 1:    
-            model_name = dir + 'RandomForest_' + year + '.sav'
+            model_name = dir + 'RandomForest_' + Ym1 + '.sav'
+            continue
         elif m == 2:    
-            model_name = dir + 'lightgbm_' + year + '.sav'
+            model_name = dir + 'lightgbm_' + Ym1 + '.sav'
+        elif m == 3:    
+            model_name = dir + 'catboost_' + Ym1 + '.sav'
         #end
 
         # 保存したモデルをロードする
@@ -123,6 +125,7 @@ def main():
         rieki_3rennpuku_l = []
         rieki_3rennpuku_sum = 0
         ite_all = 0
+        ite_atari = 0
         for ii in range(len(redata_info)):
             temp = clf.predict_proba([explanatory_test[ii]])
             trev = sorted(temp[0], reverse=True)
@@ -171,15 +174,13 @@ def main():
 
             # 3-7-7, 三連複
             import itertools
-
-            # ll = [3,4,5]         
-            # l = [8,9,10,11,12,13,14]
-            l = [3,4,5,6,7,8,9,10]
-            combi = list(itertools.combinations(l, 2))
-
+            
+            combi = list(itertools.combinations(ll7, 2))
+            
+            ii = 0
             for j in range(len(combi)):
                 
-                pred_rank1 = pred_rank[j % 3]  # 0, 1, 2, 0, 1, 2, 0, 1, 2...
+                pred_rank1 = pred_rank[ll3[j % 3]]  # 0, 1, 2, 0, 1, 2, 0, 1, 2...
                 idx = j // 3                   # 0, 0, 0, 1, 1, 1, 2, 2, 2...
                 pred_rank2 = pred_rank[combi[idx][0]]
                 pred_rank3 = pred_rank[combi[idx][1]]
@@ -198,11 +199,12 @@ def main():
                     #end
                     rieki_3rennpuku += 100 * fin_odds
                     ite = 100 * fin_odds
-                    # print(fin_odds)
+                    ii = 1
                 #end
                 rieki_3rennpuku_sum -= 100
                 rieki_3rennpuku_sum += ite
             #end
+            ite_atari += ii 
             rieki_3rennpuku_l.append(rieki_3rennpuku_sum)
         #end
 
@@ -210,6 +212,7 @@ def main():
         print(" 3連複で常に3-7-7に6300円かけた場合")
         print(" 回収金：" + str(rieki_3rennpuku))
         print(" 回収率：" + str(rieki_3rennpuku / (ite_all*len(combi)*100)))
+        print(" 的中率：" + str(ite_atari / ite_all))
         print("----------------------------")
         
         num_race_l = np.zeros(len(rieki_3rennpuku_l))
@@ -226,15 +229,16 @@ def main():
         # plt.ylim([-60, 60])
         plt.xlabel("Number of races", fontsize=14)
         # plt.ylabel("Profit, yen", fontsize=14)
-        plt.ylabel("rate, -", fontsize=14)
+        plt.ylabel("rieki, yen", fontsize=14)
         plt.xticks(fontsize=14)
         plt.yticks(fontsize=14)
-        tn = model_name.replace('_' + year + '.sav',"")
+        tn = model_name.replace('_' + Ym1 + '.sav',"")
         tn = tn.replace(dir,"")
         plt.title(tn, fontsize=14)
         plt.tight_layout()
 
-        plt.savefig("rieki_sannrennpuku_" + str(m) + "2021_2020model.png", format="png")
+        plt.savefig("rieki_sannrennpuku" + "_" + str(year) + "_" + Ym1 + "model_" + str(m) + ".png", format="png")
+        # plt.savefig("rieki_sannrennpuku" + "_2022_2021model_" + str(m) + ".png", format="png")
         plt.clf()
     #end
 #end
