@@ -69,7 +69,7 @@ def pre(dname):
                 elif temp[4] in hn:
                     temp[4] = hn.index(temp[4]) + 1 # index番号の取得
                 else:
-                    hn.append(temp[4])          # 馬名の追加
+                    # hn.append(temp[4])          # 馬名の追加
                     temp[4] = hn_ite
                     hn_ite += 1
                 #end
@@ -79,7 +79,7 @@ def pre(dname):
                 if temp[5] in tn:
                     temp[5] = tn.index(temp[5]) # index番号の取得
                 else:
-                    tn.append(temp[5])          # 騎手の追加
+                    # tn.append(temp[5])          # 騎手の追加
                     temp[5] = tn_ite
                     tn_ite += 1
                 #end
@@ -245,18 +245,18 @@ def pre(dname):
     print(" -------------------- ")
 
     # output hh, ht, 
-    with open("hn_data", "w") as f:
-        for i in range(len(hn)):
-            f.write(hn[i])
-            f.write("\n")
-        #end
-    #end
-    with open("tn_data", "w") as f:
-        for i in range(len(tn)):
-            f.write(tn[i])
-            f.write("\n")
-        #end
-    #end
+    # with open("hn_data", "w") as f:
+    #     for i in range(len(hn)):
+    #         f.write(hn[i])
+    #         f.write("\n")
+    #     #end
+    # #end
+    # with open("tn_data", "w") as f:
+    #     for i in range(len(tn)):
+    #         f.write(tn[i])
+    #         f.write("\n")
+    #     #end
+    # #end
 #end
 # ------------------------------------
 # ------------------------------------

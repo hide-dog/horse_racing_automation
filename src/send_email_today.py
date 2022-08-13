@@ -46,7 +46,14 @@ def send_email(dt_now, place, nrace, dname, Hassou_Time, err):
     #end
 
     # ---------------------------------
-    f_email = param.param()[2]
+    # mode
+    mode = param.param()[3]
+    if mode == 0:
+        f_email = param.param()[2] # e-mail list
+    else:
+        f_email = param.param()[5] # e-mail list tmp
+    #end
+
     with open(f_email, "r") as f:
         email_list = f.readlines()
     #end
@@ -82,12 +89,14 @@ def send_email(dt_now, place, nrace, dname, Hassou_Time, err):
     hou = dt_now[8:10]
     min = dt_now[10:12]
     sec = dt_now[12:14]
-    Kenmei = "{}年{}月{}日 {}　{}R 予想".format(y,m,d, place, nrace)
+    Kenmei = "{}年{}月{}日 予想".format(y,m,d)
     # ---------------
     if err == 0:    
         Body = ""
         # -----------------------
         # -----------------------
+        Body += "{}年{}月{}日 {}　{}R 予想".format(y,m,d, place, nrace)
+        Body += "\n"
         Body += "発走時刻 {}年{}月{}日 {}".format(y,m,d,Hassou_Time)
         Body += "\n"
         Body += "解析時刻 {}年{}月{}日{}時{}分{}秒".format(y,m,d,hou,min,sec)
@@ -98,15 +107,30 @@ def send_email(dt_now, place, nrace, dname, Hassou_Time, err):
         # 1 - 2,3,4,5,6
         # -----------------------
         Body += "-------------------------------\n"
+        Body += " \n"
         Body += "ワイド 1-5　フォーメーション \n" + \
-                "-------------------------------\n" + \
-                "-- 1 --------------------------\n" + \
-                "-------------------------------\n"
+                "\n" + \
+                "-- 1 --------------------------\n"
         Body += "{} {} \n".format(true_pred[0][0], true_pred[0][1])
-        Body += "-------------------------------\n" + \
-                "-- 5 --------------------------\n" + \
-                "-------------------------------\n"
+        Body += "-- 5 --------------------------\n"                
         for i in range(1, 6):
+            Body += "{} {} \n".format(true_pred[i][0], true_pred[i][1])
+        #end
+        Body += "-------------------------------\n"
+        Body += "\n\n"
+
+        # -----------------------
+        # 馬連 1-5
+        # 1 - 5,6,7,8,9
+        # -----------------------
+        Body += "-------------------------------\n"
+        Body += " \n"
+        Body += "馬連 1-5　フォーメーション \n" + \
+                "\n" + \
+                "-- 1 --------------------------\n"
+        Body += "{} {} \n".format(true_pred[0][0], true_pred[0][1])
+        Body += "-- 5 --------------------------\n"                
+        for i in range(4, 9):
             Body += "{} {} \n".format(true_pred[i][0], true_pred[i][1])
         #end
         Body += "-------------------------------\n"
@@ -118,15 +142,12 @@ def send_email(dt_now, place, nrace, dname, Hassou_Time, err):
         # -----------------------
         Body += "-------------------------------\n"
         Body += "3連複 3-7-7　フォーメーション \n" + \
-                "-------------------------------\n" + \
-                "-- 3 --------------------------\n" + \
-                "-------------------------------\n"
+                "-- 3 --------------------------\n"
         for i in range(3):
             Body += "{} {} \n".format(true_pred[i+3][0], true_pred[i+3][1])
         #end
-        Body += "-------------------------------\n" + \
-                "-- 7 --------------------------\n" + \
-                "-------------------------------\n"
+        Body += "-- 7 --------------------------\n"
+
         for i in range(3):
             Body += "{} {} \n".format(true_pred[i][0], true_pred[i][1])
         #end

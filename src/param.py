@@ -2,11 +2,13 @@
 # parameter
 # --------------------------------
 time_bf    = 15                    # 発走 x 分前に解析を開始する
-model_name = 'lightgbm_2021.sav'   # 学習モデル名
-f_email    = "email_list_tmp.txt"  # e-mailリスト ファイル
+model_name = 'model/lightgbm_latest_20220810.sav'   # 学習モデル名
+f_emailtmp = "email_list_tmp.txt"  # e-mailリスト ファイル
+f_email    = "email_list.txt"      # e-mailリスト ファイル
+# f_email = "email_list_tmp.txt"  # e-mailリスト ファイル
 
-mode       = 1                     # 実行モード, 0:通常 1:テスト用
-test_id    = "202204030101"        # テストモード用のアクセス先id
+mode       = 0                     # 実行モード, 0:通常 1:テスト用
+test_id    = "202201020101"        # テストモード用のアクセス先id
 # --------------------------------
 # --------------------------------
 def param():
@@ -14,5 +16,6 @@ def param():
            model_name, \
            f_email,    \
            mode,       \
-           test_id
+           test_id,    \
+           f_emailtmp
 #end

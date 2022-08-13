@@ -3,6 +3,8 @@ import sys
 # sys.path.append('./src') # pass
 sys.path.append('../') # pass
 import scraping_today as st
+import scraping_odds as so
+import scraping_result as sr
 import pre_today as pt
 import hr_macine_learning_today as ma
 import get_info_scraping as gis
@@ -24,14 +26,16 @@ def get_todays_sched():
     date = datetime.datetime.now()    # 時間の取得
     y = str(date.year)                # 年
     # --------------------------------
-    print(" start : getting {} / {}'s id".format(date.month, date.day))
+    print(" start : getting {} / {} 's id".format(date.month, date.day))
 
     mode    = param.param()[3]
     # test用
     if mode == 0:
         id_list, rn_list = gis.get_id()   # 検索用idの取得
     elif mode == 1:
-        id_list, rn_list = gis.get_id(param.param()[4])   # 検索用idの取得
+        # id_list, rn_list = gis.get_id(param.param()[4])   # 検索用idの取得
+        id_list = [["新潟","3","1"]]
+        rn_list = [[1]]
     #end
     print(" end : getting {} / {}'s id".format(date.month, date.day))
     
@@ -41,7 +45,7 @@ def get_todays_sched():
     
     # c = ['020110','020110','020110']      # "競馬場id m日 n回目"
     c = []
-    for i in range(len(id_list[0])):
+    for i in range(len(id_list)):
         p = misc.conv_place_to_num(id_list[i][0]) # 場所を数字に変換
         c.append(str(p).zfill(2) + \
                  str(id_list[i][1]).zfill(2) + \
@@ -53,9 +57,11 @@ def get_todays_sched():
     print(" Start Time of analysis ")
     print(" -------------- ")
     time_bf = param.param()[0]
+    race_id_list = []
     for i in range(len(c)):
         for j in rn_list[i]:
-            id = y + c[i] + str(j).zfill(2)   # raceID,  "2022030204"
+            id = y + c[i] + str(j).zfill(2)   # raceID,  "202203020104"
+            race_id_list.append(id)
             stime = gis.only_get_time(id)     # start time, "10:50"
 
             h    = int(stime[0:2])            # hour
@@ -87,10 +93,22 @@ def get_todays_sched():
         #end
     #end
     
-    # test用
-    if mode == 1:
-        return schedule.CancelJob
-    #end
+    schedule.every().day.at("17:00").do(get_result_info, race_id_list)
+    
+    # # test用
+    # if mode == 1:
+    #     return schedule.CancelJob
+    # #end
+    return schedule.CancelJob
+#end
+
+# ----------------------------------------
+# 結果情報の取得
+# ----------------------------------------
+def get_result_info(race_id_list):
+    so.get_odds(race_id_list)
+    sr.get_result(race_id_list)
+    return schedule.CancelJob
 #end
 
 # ----------------------------------------
@@ -127,8 +145,8 @@ def predict_keiba(id):
     
     # e-mail
     print(" start : sending e-mail ")
-    place = misc.conv_num_to_place(id[0:2])     # 場所を漢字に変換
-    set.send_email(dt_now, place, id[-2:0], dname, Hassou_Time, e) # メールの送信
+    place = misc.conv_num_to_place(id[4:6])     # 場所を漢字に変換
+    set.send_email(dt_now, place, id[10:12], dname, Hassou_Time, e) # メールの送信
     print(" end : sending e-mail ")
     
     print("----------------------------------------\n")
