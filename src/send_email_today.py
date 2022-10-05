@@ -62,8 +62,8 @@ def send_email(dt_now, place, nrace, dname, Hassou_Time, err):
     #end
 
     # -----------------------------
-    MAIL_ADDRESS = "yuritakagawa7281@gmail.com" # e-mail adress
-    PASSWORD     = "oscbwunbkizahofs"           # アプリパスワード
+    MAIL_ADDRESS = "xxx@gmail.com" # e-mail adress
+    PASSWORD     = "password"           # アプリパスワード
     # -----------------------------
     smtpobj = smtplib.SMTP('smtp.gmail.com', 587)  # SMTPサーバー名とポート番号
     smtpobj.ehlo()                                 # サーバーと接続を確立, 戻り値(250, b’smtp.gmail.com at your service)
