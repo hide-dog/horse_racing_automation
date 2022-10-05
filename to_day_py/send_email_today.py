@@ -51,8 +51,8 @@ def main(dt_now, place, nrace):
     #end
 
     # -----------------------------
-    MAIL_ADDRESS = "yuritakagawa7281@gmail.com" # e-mail adress
-    PASSWORD     = "oscbwunbkizahofs"           # アプリパスワード
+    MAIL_ADDRESS = "xxx@gmail.com" # e-mail adress
+    PASSWORD     = "password"      # アプリパスワード
     # -----------------------------
     smtpobj = smtplib.SMTP('smtp.gmail.com', 587)  # SMTPサーバー名とポート番号
     smtpobj.ehlo()                                 # サーバーと接続を確立, 戻り値(250, b’smtp.gmail.com at your service)
@@ -85,16 +85,13 @@ def main(dt_now, place, nrace):
             "-- 3 --------------------------\n" + \
             "-------------------------------\n"
     for i in range(3):
-        Body += "{} {} \n".format(true_pred[i+3][0], true_pred[i+3][1])
+        Body += "{} {} \n".format(true_pred[i][0], true_pred[i][1])
     #end
     Body += "-------------------------------\n" + \
             "-- 7 --------------------------\n" + \
             "-------------------------------\n"
-    for i in range(3):
-        Body += "{} {} \n".format(true_pred[i][0], true_pred[i][1])
-    #end
-    for i in range(4):
-        Body += "{} {} \n".format(true_pred[i+6][0], true_pred[i+6][1])
+    for i in range(7):
+        Body += "{} {} \n".format(true_pred[i+3][0], true_pred[i+3][1])
     #end
     # ---------------
 
