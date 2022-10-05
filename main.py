@@ -33,7 +33,7 @@ def main_loop():
         print("\n")
     #end
 
-    # 1秒毎にスケジュールを確認し、時間が来たら実行
+    # 秒毎にスケジュールを確認し、時間が来たら実行
     while True:
         schedule.run_pending()
         time.sleep(5)
