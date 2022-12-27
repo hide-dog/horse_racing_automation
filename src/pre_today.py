@@ -94,6 +94,7 @@ def pre(dname):
                 # delta weight
                 try:
                     dw = ((temp[6].split("(")[1]).split(")")[0]).replace("+","")
+                    dw = str(int(dw))
                 except:
                     dw = str(0)
                 #end
